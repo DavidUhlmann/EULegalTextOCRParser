@@ -88,8 +88,6 @@ class Chapter:
 def extract_text_from_pdf(path: Path) -> str:
     """Extract text from *path* using pdfplumber (preferred) or PyPDF2."""
 
-    pdfplumber_error: Optional[Exception] = None
-
     try:
         import pdfplumber  # type: ignore
 
@@ -97,26 +95,16 @@ def extract_text_from_pdf(path: Path) -> str:
             pages = [page.extract_text() or "" for page in pdf.pages]
         return "\n".join(pages)
     except ModuleNotFoundError:
-        pass
-    except Exception as exc:  # pdfplumber couldn't open or parse the file
-        pdfplumber_error = exc
+        try:
+            from PyPDF2 import PdfReader  # type: ignore
 
-    try:
-        from PyPDF2 import PdfReader  # type: ignore
-
-        reader = PdfReader(str(path))
-        return "\n".join(page.extract_text() or "" for page in reader.pages)
-    except ModuleNotFoundError as exc:  # pragma: no cover - import fallback guard
-        raise RuntimeError(
-            "Neither pdfplumber nor PyPDF2 is installed. Install one of them to enable "
-            "PDF text extraction."
-        ) from exc
-    except Exception as exc:
-        if pdfplumber_error is not None:
+            reader = PdfReader(str(path))
+            return "\n".join(page.extract_text() or "" for page in reader.pages)
+        except ModuleNotFoundError as exc:  # pragma: no cover - import fallback guard
             raise RuntimeError(
-                f"Failed to extract text from {path}: {pdfplumber_error}"
+                "Neither pdfplumber nor PyPDF2 is installed. Install one of them to "
+                "enable PDF text extraction."
             ) from exc
-        raise
 
 
 def _normalise_line(line: str) -> str:
