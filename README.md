@@ -1,4 +1,4 @@
-# EULegalTextOCRParser
+# EU Legal Text OCR Parser
 Creates JSON objects from EU Legal text for better AI input.\
 When working with Legal Text in the EU people often parse long PDFs into tools like ChatGPT.
 However, the PDF parser of those tools, even on premium, seems to hallucinate and/or end parsing those legal text after a certain amount of pages.
